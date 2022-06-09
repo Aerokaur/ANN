@@ -38,7 +38,7 @@
 #		OTHERLIBS	other libraries
 #-----------------------------------------------------------------------------
 
-BASEDIR	= /Users/sharan/Desktop/Study/Research/Summer_2022/Argonne/software/ann_1.1.2
+BASEDIR	= ..
 INCDIR	= $(BASEDIR)/include
 LIBDIR	= $(BASEDIR)/lib
 BINDIR	= $(BASEDIR)/bin
