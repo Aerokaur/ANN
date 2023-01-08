@@ -36,7 +36,7 @@ LIBDIR	= $(BASEDIR)/lib
 INTERFACE_DIR = F_Interface
 
 # hdfc path
-FF = /nfs/gce/projects/FLASH5/software/hdf5/install/bin/h5pfc
+FF = h5pfc
 
 CPP_SOURCES := $(wildcard *.cpp)
 CINT_SOURCES := $(wildcard $(INTERFACE_DIR)/*.cpp)
