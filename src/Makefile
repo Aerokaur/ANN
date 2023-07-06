@@ -35,7 +35,7 @@ INCDIR	= $(BASEDIR)/include
 LIBDIR	= $(BASEDIR)/lib
 
 # hdfc path
-FF = /usr/local/hdf5-1.8.20/bin/h5pfc
+FF = h5pfc
 
 CPP_SOURCES := $(wildcard *.cpp)
 FF_SOURCES := $(wildcard *.F90)
