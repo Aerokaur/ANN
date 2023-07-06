@@ -33,24 +33,21 @@
 BASEDIR	= ..
 INCDIR	= $(BASEDIR)/include
 LIBDIR	= $(BASEDIR)/lib
-INTERFACE_DIR = F_Interface
 
 # hdfc path
-FF = /nfs/gce/projects/FLASH5/software/hdf5/install/bin/h5pfc
+FF = /usr/local/hdf5-1.8.20/bin/h5pfc
 
 CPP_SOURCES := $(wildcard *.cpp)
-CINT_SOURCES := $(wildcard $(INTERFACE_DIR)/*.cpp)
-FINT_SOURCES := $(wildcard $(INTERFACE_DIR)/*.F90)
+FF_SOURCES := $(wildcard *.F90)
 
-CPP_OBJS := $(patsubst .%,$(INTERFACE_DIR)/%,$(CPP_SOURCES:.cpp=.o))
-INT_OBJS := $(patsubst $(INTERFACE_DIR)/%,$(INTERFACE_DIR)/%,$(CINT_SOURCES:.cpp=.o))
-INT_OBJS += $(patsubst $(INTERFACE_DIR)/%,$(INTERFACE_DIR)/%,$(FINT_SOURCES:.F90=.o))
+CPP_OBJS := $(CPP_SOURCES:.cpp=.o)
+FF_OBJS := $(FF_SOURCES:.F90=.o)
 
 
 CPPHEADERS = kd_tree.h kd_split.h kd_util.h kd_search.h \
 	kd_pr_search.h kd_fix_rad_search.h perf.h pr_queue.h pr_queue_k.h
 
-OBJECTS := $(CPP_OBJS) $(INT_OBJS)
+OBJECTS := $(CPP_OBJS) $(FF_OBJS)
 #-----------------------------------------------------------------------------
 # Make the library
 #-----------------------------------------------------------------------------
@@ -70,10 +67,7 @@ $(LIBDIR)/$(ANNLIB): $(OBJECTS)
 %.o: %.cpp Makefile
 	$(C++) -c -I$(INCDIR) $(CFLAGS) -o $@ $<
 
-$(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cpp Makefile
-	$(C++) -c -I$(INCDIR) $(CFLAGS) -o $@ $<
-
-$(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.F90 Makefile
+%.o %.mod: %.F90 Makefile
 	$(FF)  -c -o $@ $<
 
 #-----------------------------------------------------------------------------
@@ -90,8 +84,6 @@ install:
 #-----------------------------------------------------------------------------
 
 clean:
-	-rm -f *.o core; cd $(INTERFACE_DIR); rm -f *.o
-	cd $(INCDIR); rm -f *.mod
+	-rm -f *.o *.mod core
 
 realclean: clean
-

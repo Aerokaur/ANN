@@ -97,11 +97,10 @@ DISTR = ann_1.1.2
 
 distribution: realclean 
 	cd .. ; mv -f $(DISTR) $(DISTR)-old; mkdir $(DISTR)
-	cp Copyright.txt ../$(DISTR)
-	cp License.txt ../$(DISTR)
+	cp LICENSE ../$(DISTR)
 	cp Make-config ../$(DISTR)
 	cp Makefile ../$(DISTR)
-	cp ReadMe.txt ../$(DISTR)
+	cp README ../$(DISTR)
 	cp -r MS_Win32 ../$(DISTR)
 #	cd ..; mv -f $(DISTR)_MS_Win32_bin $(DISTR)_MS_Win32_bin-old
 	cp -r MS_Win32_bin ../$(DISTR)_MS_Win32_bin
