@@ -17,20 +17,20 @@ extern "C"
         dataPts[i][j] = _dataPts[i + j * rows];
       }
     }
-    cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << endl;
-    cout << "printing data points in ann_buildTree_c() " << endl;
+    //cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << endl;
+    //cout << "printing data points in ann_buildTree_c() " << endl;
     int nPts = 0;
     while (nPts < rows)
     {
-      cout << "(" << dataPts[nPts][0];
+      //cout << "(" << dataPts[nPts][0];
       for (int j = 1; j < cols; j++)
       {
-        cout << ", " << dataPts[nPts][j];
+        //cout << ", " << dataPts[nPts][j];
       }
-      cout << ")\n";
+      //cout << ")\n";
       ++nPts;
     }
-    cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << endl;
+    //cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++ " << endl;
     // Create a tree object
     kdTree = new ANNkd_tree(dataPts, rows, cols);
   }
