@@ -74,7 +74,9 @@ linux-g++:
 	"C++ = g++" \
 	"CFLAGS = -O3" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					Mac OS X using g++
 macosx-g++:
@@ -83,7 +85,9 @@ macosx-g++:
 	"C++ = g++" \
 	"CFLAGS = -O3" \
 	"MAKELIB = libtool -static -o " \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS5
 sunos5:
@@ -92,7 +96,9 @@ sunos5:
 	"C++ = CC" \
 	"CFLAGS = -O" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS5 with shared libraries
 sunos5-sl:
@@ -101,7 +107,9 @@ sunos5-sl:
 	"C++ = CC" \
 	"CFLAGS = -Kpic -O" \
 	"MAKELIB = ld -G -o" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS5 with g++
 sunos5-g++:
@@ -110,7 +118,9 @@ sunos5-g++:
 	"C++ = g++" \
 	"CFLAGS = -O3" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS5 with g++ and shared libraries
 sunos5-g++-sl:
@@ -119,7 +129,9 @@ sunos5-g++-sl:
 	"C++ = g++" \
 	"CFLAGS = -fpic -O3" \
 	"MAKELIB = ld -G -o" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #-----------------------------------------------------------------------
 # Used for the author's testing and debugging only
@@ -132,8 +144,9 @@ authors-debug:
 	"C++ = g++" \
 	"CFLAGS = -g -DANN_PERF -Wall" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = true"
-
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 #					performance testing version for authors
 authors-perf:
 	$(MAKE) targets \
@@ -141,7 +154,9 @@ authors-perf:
 	"C++ = g++" \
 	"CFLAGS = -O3 -DANN_PERF -Wall" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #-----------------------------------------------------------------------
 # Some older ones that I have not tested with the latest version.
@@ -153,7 +168,9 @@ sgi:
 	"C++ = CC -ansi" \
 	"CFLAGS = -O2" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = true"
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					DEC Alpha with g++
 alpha-g++:
@@ -162,7 +179,9 @@ alpha-g++:
 	"C++ = g++" \
 	"CFLAGS = -O3" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = ranlib"
+	"RANLIB = ranlib" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS4
 sunos4:
@@ -171,7 +190,9 @@ sunos4:
 	"C++ = CC" \
 	"CFLAGS = -O" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = ranlib"
+	"RANLIB = ranlib" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS4 with g++
 sunos4-g++:
@@ -180,7 +201,9 @@ sunos4-g++:
 	"C++ = g++" \
 	"CFLAGS = -O3" \
 	"MAKELIB = ar ruv" \
-	"RANLIB = ranlib"
+	"RANLIB = ranlib" \
+	"FF = gfortran" \
+	"FLAGS = -O3"
 
 #					SunOS4 with g++ and shared libraries
 sunos4-g++-sl:
@@ -190,5 +213,6 @@ sunos4-g++-sl:
 	"CC = g++" \
 	"CFLAGS = -fPIC -O3" \
 	"MAKELIB = ld -assert pure-text -o" \
-	"RANLIB = true"
-
+	"RANLIB = true" \
+	"FF = gfortran" \
+	"FLAGS = -O3"

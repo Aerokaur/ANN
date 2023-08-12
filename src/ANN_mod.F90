@@ -2,7 +2,7 @@ module ANN_mod
    use iso_c_binding
    use ANN_types_mod
    implicit none
-   public :: ANN_buildTree, ANN_kSearch
+   public :: ann_buildTree, ann_kSearch
  
    interface
       subroutine ann_buildTree_C(C_rows, C_cols, C_dataPts, kdTree) bind(c, name="ann_buildTree_c")

@@ -33,24 +33,18 @@
 BASEDIR	= ..
 INCDIR	= $(BASEDIR)/include
 LIBDIR	= $(BASEDIR)/lib
-INTERFACE_DIR = F_Interface
-
-# hdfc path
-FF = h5pfc
 
 CPP_SOURCES := $(wildcard *.cpp)
-CINT_SOURCES := $(wildcard $(INTERFACE_DIR)/*.cpp)
-FINT_SOURCES := $(wildcard $(INTERFACE_DIR)/*.F90)
+FF_SOURCES := $(wildcard *.F90)
 
-CPP_OBJS := $(patsubst .%,$(INTERFACE_DIR)/%,$(CPP_SOURCES:.cpp=.o))
-INT_OBJS := $(patsubst $(INTERFACE_DIR)/%,$(INTERFACE_DIR)/%,$(CINT_SOURCES:.cpp=.o))
-INT_OBJS += $(patsubst $(INTERFACE_DIR)/%,$(INTERFACE_DIR)/%,$(FINT_SOURCES:.F90=.o))
+CPP_OBJS := $(patsubst .%,%,$(CPP_SOURCES:.cpp=.o))
+FF_OBJS += $(patsubst .%,%,$(FF_SOURCES:.F90=.o))
 
 
 CPPHEADERS = kd_tree.h kd_split.h kd_util.h kd_search.h \
 	kd_pr_search.h kd_fix_rad_search.h perf.h pr_queue.h pr_queue_k.h
 
-OBJECTS := $(CPP_OBJS) $(INT_OBJS)
+OBJECTS := $(CPP_OBJS) $(FF_OBJS)
 #-----------------------------------------------------------------------------
 # Make the library
 #-----------------------------------------------------------------------------
@@ -64,17 +58,15 @@ $(LIBDIR)/$(ANNLIB): $(OBJECTS)
 	$(MAKELIB) $(ANNLIB) $(OBJECTS)
 	$(RANLIB) $(ANNLIB)
 	mv $(ANNLIB) $(LIBDIR)
+	cp *.mod $(INCDIR)
 #-----------------------------------------------------------------------------
 # Make object files
 #-----------------------------------------------------------------------------
 %.o: %.cpp Makefile
 	$(C++) -c -I$(INCDIR) $(CFLAGS) -o $@ $<
 
-$(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.cpp Makefile
-	$(C++) -c -I$(INCDIR) $(CFLAGS) -o $@ $<
-
-$(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.F90 Makefile
-	$(FF)  -c -o $@ $<
+%.o: %.F90 Makefile
+	$(FF)  -c $(FFLAGS) -o $@ $<
 
 #-----------------------------------------------------------------------------
 # Configuration definitions
@@ -82,15 +74,12 @@ $(INTERFACE_DIR)/%.o: $(INTERFACE_DIR)/%.F90 Makefile
 
 include ../Make-config
 
-install: 
-	mv *.mod $(INCDIR)
-
 #-----------------------------------------------------------------------------
 # Cleaning
 #-----------------------------------------------------------------------------
 
 clean:
-	-rm -f *.o core; cd $(INTERFACE_DIR); rm -f *.o
+	-rm -f *.o core;
 	cd $(INCDIR); rm -f *.mod
 
 realclean: clean
