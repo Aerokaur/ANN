@@ -79,7 +79,7 @@ include ../Make-config
 #-----------------------------------------------------------------------------
 
 clean:
-	-rm -f *.o core;
+	-rm -f *.o core *.mod;
 	cd $(INCDIR); rm -f *.mod
 
 realclean: clean
