@@ -1,7 +1,7 @@
 ANN: Approximate Nearest Neighbors
 
 This library includes the Fortran-C interface for using ANN with FORTRAN libraries.
-Just add path to `lib` and `include` directoris after `make install` to use ANN with
+Just add path to `lib` and `include` directoris after compilation to use ANN with
 your source code
 
 Authors
