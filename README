@@ -1,28 +1,12 @@
 ANN: Approximate Nearest Neighbors
-Version: 1.1.2
-Release date: Jan 27, 2010
-----------------------------------------------------------------------------
-Copyright (c) 1997-2010 University of Maryland and Sunil Arya and David
-Mount. All Rights Reserved.  See Copyright.txt and License.txt for
-complete information on terms and conditions of use and distribution of
-this software.
-----------------------------------------------------------------------------
+
+This library includes the Fortran-C interface for using ANN with FORTRAN libraries.
+Just add path to `lib` and `include` directoris after `make install` to use ANN with
+your source code
 
 Authors
 -------
-David Mount
-Dept of Computer Science
-University of Maryland,
-College Park, MD 20742 USA
-mount@cs.umd.edu
-http://www.cs.umd.edu/~mount/
-
-Sunil Arya
-Dept of Computer Science
-Hong University of Science and Technology
-Clearwater Bay, HONG KONG
-arya@cs.ust.hk
-http://www.cs.ust.hk/faculty/arya/
+Sharan Kaur, Akash Dhruv, David Mount and Sunil Arya
 
 Introduction
 ------------
@@ -68,3 +52,5 @@ History
     Updated old source comments for GNU LPL.
   Version 1.1.2  01/27/10
     Fixed minor compilation bugs for new versions of gcc
+  Version 1.1.2  08/12/23
+    Adding FORTRAN-C interface
