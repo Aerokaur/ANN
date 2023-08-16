@@ -56,5 +56,11 @@ extern "C"
       _nnIdx[idx] = nnIdx[idx];
     }
   }
-  
+
+  // Deallocation of memory 
+  void ann_destroyTree_c(ANNkd_tree *kdTree)
+  {
+    //kdTree->~ANNkd_tree();
+    annClose();
+  }  
 }
