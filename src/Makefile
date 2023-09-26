@@ -38,8 +38,8 @@ LIBDIR	= $(BASEDIR)/lib
 FF = h5pfc
 
 CPP_SOURCES := $(wildcard *.cpp)
-FF_SOURCES := $(wildcard *.F90)
-
+#FF_SOURCES := $(wildcard *.F90)
+FF_SOURCES = ann_types_mod.F90 ann_mod.F90
 CPP_OBJS := $(CPP_SOURCES:.cpp=.o)
 FF_OBJS := $(FF_SOURCES:.F90=.o)
 

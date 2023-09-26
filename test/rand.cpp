@@ -204,7 +204,21 @@ void annUniformPts(				// uniform distribution
 		}
 	}
 }
-
+//----------------------------------------------------------------------
+//	annUniformPts2 - Generate uniformly distributed points
+//		A uniform distribution over [-2,2].
+//----------------------------------------------------------------------
+void annUniformPts2(				// uniform distribution
+	ANNpointArray		pa,				// point array (modified)
+	int					n,				// number of points
+	int					dim)			// dimension
+{
+	for (int i = 0; i < n; i++) {
+		for (int d = 0; d < dim; d++) {
+			pa[i][d] = (ANNcoord) (annRanUnif(-2,2));
+		}
+	}
+}
 //----------------------------------------------------------------------
 //	annGaussPts - Generate Gaussian distributed points
 //		A Gaussian distribution with zero mean and the given standard

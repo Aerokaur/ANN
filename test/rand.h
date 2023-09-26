@@ -69,6 +69,11 @@ void annUniformPts(				// uniform distribution
 	int				n,			// number of points
 	int				dim);		// dimension
 
+void annUniformPts2(				// uniform distribution
+	ANNpointArray	pa,			// point array (modified)
+	int				n,			// number of points
+	int				dim);		// dimension
+	
 void annGaussPts(				// Gaussian distribution
 	ANNpointArray	pa,			// point array (modified)
 	int				n,			// number of points
