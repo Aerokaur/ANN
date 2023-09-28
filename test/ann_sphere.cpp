@@ -47,13 +47,20 @@ bool readPt(istream &in, ANNpoint p) // read point (false on EOF)
 	return true;
 }
 
+/// @brief  Generate points in a cube of [-2 2]^3
+/// @param pa - // point array (returned)
+/// @param n -  // number of points to generate
+/// @param type - // point type
+/// @param new_clust - // new cluster centers desired?
+/// @param src - // source array (if distr=PLANTED)
+/// @param n_src -  // source size (if distr=PLANTED)
 void generatePts(
-	ANNpointArray &pa, // point array (returned)
-	int n,			   // number of points to generate
-	PtType type,	   // point type
-	ANNbool new_clust, // new cluster centers desired?
-	ANNpointArray src, // source array (if distr=PLANTED)
-	int n_src)		   // source size (if distr=PLANTED)
+	ANNpointArray &pa,
+	int n,
+	PtType type,
+	ANNbool new_clust,
+	ANNpointArray src,
+	int n_src)
 {
 	if (pa != NULL)
 		annDeallocPts(pa);	  // get rid of any old points
@@ -86,10 +93,10 @@ int main(int argc, char **argv)
 
 	getArgs(argc, argv); // read command-line arguments
 	cout << "generating query points " << endl;
-	ofstream queryOut("sphere_query_20.pts");
+	ofstream queryOut("sphere_query_10000.pts");
 	new_clust = ANNfalse;
 	query_pts = NULL;
-	query_size = 20;
+	query_size = 10000;
 	generatePts(	// generate query points
 		query_pts,	// point array
 		query_size, // number of query points
@@ -127,7 +134,9 @@ int main(int argc, char **argv)
 		dim);				 // dimension of space
 
 	while (readPt(*queryIn, queryPt))
-	{ // read query points
+	{  
+		
+	    // read query points
 		// cout << "Query point: "; // echo query point
 		// printPt(cout, queryPt);
 
