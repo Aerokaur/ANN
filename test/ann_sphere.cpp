@@ -1,11 +1,18 @@
-#include <cstdlib>	 // C standard library
-#include <cstdio>	 // C I/O (for sscanf)
-#include <cstring>	 // string manipulation
-#include <fstream>	 // file I/O
-#include <ANN/ANN.h> // ANN declarations
-#include "rand.h"	 // random point generation
-
-#ifndef CLOCKS_PER_SEC // define clocks-per-second if needed
+//-----------------------------------------------------------------------------------------------
+// ann_sphere
+// This program builds kd and bd tree for sphere case. It compares the time taken 
+// for both trees built using different parameters.
+// To compile this program: ` sh run_sphere.sh `
+//-----------------------------------------------------------------------------------------------
+#include <cstdlib>		 // C standard library
+#include <cstdio>		 // C I/O (for sscanf)
+#include <cstring>		 // string manipulation
+#include <fstream>		 // file I/O
+#include <ANN/ANN.h>	 // ANN declarations
+#include "rand.h"		 // random point generation
+#include <ANN/ANNx.h>	 // more ANN declarations
+#include <ANN/ANNperf.h> // performance evaluation
+#ifndef CLOCKS_PER_SEC	 // define clocks-per-second if needed
 #define CLOCKS_PER_SEC 1000000
 #endif
 using namespace std; // make std:: accessible
@@ -16,6 +23,115 @@ typedef enum
 	QUERY
 } PtType; // point types
 
+//----------------------------------------------------------------------
+//	Parameters that are set in getArgs()
+//----------------------------------------------------------------------
+void getArgs(int argc, char **argv); // get command-line arguments
+
+int k = 1;					// number of nearest neighbors
+int dim = 3;				// dimension
+double eps = 0;				// error bound
+int maxPts = 10000000;		// maximum number of data points
+const int STRING_LEN = 500; // max string length
+int query_size;
+istream *dataIn = NULL;	 // input for data points
+istream *queryIn = NULL; // input for query points
+int bucket_size = 1;	 // bucket size
+ANNsplitRule split;		 // splitting rule
+ANNshrinkRule shrink;	 // shrinking rule
+
+void readPts(		   // read data/query points from file
+	ANNpointArray &pa, // point array (returned)
+	int &n,			   // number of points
+	char *file_nm,	   // file name
+	PtType type);	   // point type (DATA, QUERY)
+
+void Error(			 // error routine
+	const char *msg, // error message
+	ANNerr level)	 // abort afterwards
+{
+	if (level == ANNabort)
+	{
+		cerr << "ann_test: ERROR------->" << msg << "<-------------ERROR\n";
+		exit(1);
+	}
+	else
+	{
+		cerr << "ann_test: WARNING----->" << msg << "<-------------WARNING\n";
+	}
+}
+
+void readPts(
+	ANNpointArray &pa, // point array (returned)
+	int &n,			   // number of points
+	char *file_nm,	   // file name
+	PtType type)	   // point type (DATA, QUERY)
+{
+	int i;
+	//--------------------------------------------------------------------
+	//	Open input file and read points
+	//--------------------------------------------------------------------
+	ifstream in_file(file_nm); // try to open data file
+	if (!in_file)
+	{
+		cerr << "File name: " << file_nm << "\n";
+		Error("Cannot open input data/query file", ANNabort);
+	}
+	// allocate storage for points
+	if (pa != NULL)
+		annDeallocPts(pa); // get rid of old points
+	pa = annAllocPts(n, dim);
+
+	for (i = 0; i < n; i++)
+	{ // read the data
+		if (!(in_file >> pa[i][0]))
+			break;
+		for (int d = 1; d < dim; d++)
+		{
+			in_file >> pa[i][d];
+		}
+	}
+
+	char ignore_me;		  // character for EOF test
+	in_file >> ignore_me; // try to get one more character
+	if (!in_file.eof())
+	{ // exhausted space before eof
+		if (type == DATA)
+			Error("`data_size' too small. Input file truncated.", ANNwarn);
+		else
+			Error("`query_size' too small. Input file truncated.", ANNwarn);
+	}
+	n = i; // number of points read
+
+	//--------------------------------------------------------------------
+	//	Print summary
+	//--------------------------------------------------------------------
+	// if (stats > SILENT) {
+	// 	if (type == DATA) {
+	// 		cout << "[Read Data Points:\n";
+	// 		cout << "  data_size  = " << n << "\n";
+	// 	}
+	// 	else {
+	// 		cout << "[Read Query Points:\n";
+	// 		cout << "  query_size = " << n << "\n";
+	// 	}
+	// 	cout << "  file_name  = " << file_nm << "\n";
+	// 	cout << "  dim        = " << dim << "\n";
+	// 											// print if results requested
+	// 	if ((type == DATA && stats >= SHOW_PTS) ||
+	// 		(type == QUERY && stats >= QUERY_RES)) {
+	// 		cout << "  (Points:\n";
+	// 		for (i = 0; i < n; i++) {
+	// 			cout << "    " << i << "\t";
+	// 			printPoint(pa[i], dim);
+	// 			cout << "\n";
+	// 		}
+	// 		cout << "  )\n";
+	// 	}
+	// 	cout << "]\n";
+	// }
+}
+
 void generatePts(			  // generate data/query points
 	ANNpointArray &pa,		  // point array (returned)
 	int n,					  // number of points
@@ -24,19 +140,20 @@ void generatePts(			  // generate data/query points
 	ANNpointArray src = NULL, // source array (for PLANTED)
 	int n_src = 0);			  // source size (for PLANTED)
 
-//----------------------------------------------------------------------
-//	Parameters that are set in getArgs()
-//----------------------------------------------------------------------
-void getArgs(int argc, char **argv); // get command-line arguments
+int lookUp(							 // look up name in table
+	const char *arg,				 // name to look up
+	const char (*table)[STRING_LEN], // name table
+	int size)						 // table size
+{
+	int i;
+	for (i = 0; i < size; i++)
+	{
+		if (!strcmp(arg, table[i]))
+			return i;
+	}
+	return i;
+}
 
-int k = 1;		   // number of nearest neighbors
-int dim = 2;	   // dimension
-double eps = 0;	   // error bound
-int maxPts = 1000; // maximum number of data points
-
-istream *dataIn = NULL;	 // input for data points
-istream *queryIn = NULL; // input for query points
-// ostream *queryOut = NULL; // input for query points
 bool readPt(istream &in, ANNpoint p) // read point (false on EOF)
 {
 	for (int i = 0; i < dim; i++)
@@ -80,22 +197,44 @@ void printPt(ostream &out, ANNpoint p) // print point
 
 int main(int argc, char **argv)
 {
-	int nPts;				 // actual number of data points
-	ANNpointArray dataPts;	 // data points
-	ANNpointArray query_pts; // query points
-	ANNpoint queryPt;		 // query point
-	ANNidxArray nnIdx;		 // near neighbor indices
-	ANNdistArray dists;		 // near neighbor distances
-	ANNkd_tree *kdTree;
-	int query_size;	   // number of queries
-	ANNbool new_clust; // generate new clusters?
-	// search structure
-
-	getArgs(argc, argv); // read command-line arguments
-	cout << "generating query points " << endl;
+	int nPts;							// actual number of data points
+	ANNpointArray dataPts;				// data points
+	ANNpointArray query_pts;			// query points
+	ANNpoint queryPt;					// query point
+	ANNidxArray nnIdx;					// near neighbor indices
+	ANNdistArray dists;					// near neighbor distances
+	ANNkd_tree *kdTree;					// search structure
+	ANNbd_tree *the_tree;				// kd- or bd-tree search structure
+	getArgs(argc, argv);				// read command-line arguments
+	const int STRING_LEN = 500;			// max string length
+	char arg[STRING_LEN];				// all-purpose argument
+	queryPt = annAllocPt(dim);			// allocate query point
+	dataPts = annAllocPts(maxPts, dim); // allocate data points
+	nnIdx = new ANNidx[k];				// allocate near neigh indices
+	dists = new ANNdist[k];				// allocate near neighbor dists
+	long clock0;						// clock time
+	nPts = 0;							// read data points
+	cout << "dim " << dim << endl;
+	// cout << "Data Points:\n";
+	query_pts = annAllocPts(maxPts, dim);
+	while (nPts < maxPts && readPt(*dataIn, dataPts[nPts]))
+	{
+		// printPt(cout, dataPts[nPts]);
+		nPts++;
+	}
+	nPts = 0;
+	// cout << "Query Points:\n";
+	while (nPts < maxPts && readPt(*queryIn, query_pts[nPts]))
+	{
+		// printPt(cout, query_pts[nPts]);
+		nPts++;
+	}
+	cout << "#nearest neighbors " << k << endl;
+/// if generating query points
+#if 0
+    cout << "generating query points " << endl;
 	ofstream queryOut("sphere_query_10000.pts");
 	new_clust = ANNfalse;
-	query_pts = NULL;
 	query_size = 10000;
 	generatePts(	// generate query points
 		query_pts,	// point array
@@ -114,46 +253,74 @@ int main(int argc, char **argv)
 		queryOut << "\n";
 	}
 	queryOut.close();
-	queryPt = annAllocPt(dim);			// allocate query point
-	dataPts = annAllocPts(maxPts, dim); // allocate data points
-	nnIdx = new ANNidx[k];				// allocate near neigh indices
-	dists = new ANNdist[k];				// allocate near neighbor dists
-
-	nPts = 0; // read data points
-
-	// cout << "Data Points:\n";
-	while (nPts < maxPts && readPt(*dataIn, dataPts[nPts]))
-	{
-		// printPt(cout, dataPts[nPts]);
-		nPts++;
-	}
+#endif
 
 	kdTree = new ANNkd_tree( // build search structure
 		dataPts,			 // the data points
 		nPts,				 // number of points
 		dim);				 // dimension of space
-
-	while (readPt(*queryIn, queryPt))
-	{  
-		
-	    // read query points
+	clock0 = clock();		 // start time
+	for (int i = 0; i < query_size; i++)
+	{
 		// cout << "Query point: "; // echo query point
-		// printPt(cout, queryPt);
+		// printPt(cout, query_pts[i]);
 
 		kdTree->annkSearch( // search
-			queryPt,		// query point
+			query_pts[i],	// query point
 			k,				// number of near neighbors
 			nnIdx,			// nearest neighbors (returned)
 			dists,			// distance (returned)
 			eps);			// error bound
+							//------------------------------------------------------------
 
-		cout << "\tNN:\tIndex\tDistance\n";
-		for (int i = 0; i < k; i++)
-		{							   // print summary
-			dists[i] = sqrt(dists[i]); // unsquare distance
-			cout << "\t" << i << "\t" << nnIdx[i] << "\t" << dists[i] << "\n";
-		}
+		//	Print summary
+		//------------------------------------------------------------
+		// cout << "\tNN:\tIndex\tDistance\n";
+		// for (int i = 0; i < k; i++)
+		// {							   // print summary
+		// 	dists[i] = sqrt(dists[i]); // unsquare distance
+		// 	cout << "\t" << i << "\t" << nnIdx[i] << "\t" << dists[i] << "\n";
+		// }
 	}
+	long prep_time_kd = clock() - clock0; // end of prep time
+	cout << " Time for kd search: "
+		 << double(prep_time_kd) / CLOCKS_PER_SEC << " sec\n";
+	/// bd tree
+	clock0 = clock(); // start time
+	for (int i = 0; i < query_size; i++)
+	{
+		// cout << "Query point: "; // echo query point
+		// printPt(cout, query_pts[i]);
+		//------------------------------------------------------------
+		//	Build the tree
+		//------------------------------------------------------------
+		the_tree = new ANNbd_tree( // build it
+			dataPts,			   // the data points
+			nPts,				   // number of points
+			dim,				   // dimension of space
+			bucket_size,		   // maximum bucket size
+			ANN_KD_SUGGEST,		   // splitting rule
+			ANN_BD_NONE);		   // shrinking rule
+
+		the_tree->annkSearch(
+			query_pts[i], // query point
+			k,			  // number of near neighbors
+			nnIdx,		  // nearest neighbors (returned)
+			dists,		  // distance (returned)
+			eps);		  // error bound
+						  //------------------------------------------------------------
+						  //	Print summary
+						  //------------------------------------------------------------
+						  // cout << "\tNN:\tIndex\tDistance\n";
+						  // for (int i = 0; i < k; i++)
+						  // {							   // print summary
+						  // 	dists[i] = sqrt(dists[i]); // unsquare distance
+						  // 	cout << "\t" << i << "\t" << nnIdx[i] << "\t" << dists[i] << "\n";
+						  // }
+	}
+	long prep_time_bd = clock() - clock0; // end of prep time
+	cout << " Time for bd search: "
+		 << double(prep_time_bd) / CLOCKS_PER_SEC << " sec\n";
 	delete[] nnIdx; // clean things up
 	delete[] dists;
 	delete kdTree;
@@ -175,13 +342,14 @@ void getArgs(int argc, char **argv)
 	{ // no arguments
 		cerr << "Usage:\n\n"
 			 << "  ann_sample [-d dim] [-max m] [-nn k] [-e eps] [-df data]"
-				" [-qf query]\n\n"
+				" [-qs query_size] [-qf query]\n\n"
 			 << "  where:\n"
 			 << "    dim      dimension of the space (default = 2)\n"
 			 << "    m        maximum number of data points (default = 1000)\n"
 			 << "    k        number of nearest neighbors per query (default 1)\n"
 			 << "    eps      the error bound (default = 0.0)\n"
 			 << "    data     name of file containing data points\n"
+			 << " 	 query_size size of query points\n"
 			 << "    query    name of file containing query points\n\n"
 			 << " Results are sent to the standard output.\n"
 			 << "\n"
@@ -227,6 +395,10 @@ void getArgs(int argc, char **argv)
 				exit(1);
 			}
 			queryIn = &queryStream; // make this query stream
+		}
+		else if (!strcmp(argv[i], "-qs"))
+		{								  // -query size
+			query_size = atoi(argv[++i]); // size of query
 		}
 		else
 		{ // illegal syntax
