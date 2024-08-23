@@ -56,7 +56,7 @@ contains
 
    subroutine ann_destroyTree(kdTree)
       type(c_ptr) :: kdTree
-      call ann_destroyTree_C(kdTree)
+      !!call ann_destroyTree_C(kdTree)
       kdTree = c_null_ptr
    end subroutine ann_destroyTree
 

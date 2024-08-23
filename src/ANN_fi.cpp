@@ -55,6 +55,7 @@ extern "C"
       _dists[idx] = dists[idx];
       _nnIdx[idx] = nnIdx[idx];
     }
+    delete queryPt;
     delete nnIdx;
     delete dists;
   }
